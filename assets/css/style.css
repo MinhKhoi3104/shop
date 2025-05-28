@@ -1,0 +1,241 @@
+/* Custom styles for Simple Shop */
+.card-img-top { object-fit: contain; max-height: 200px; background: #f8f9fa; } 
+
+/* Custom CSS */
+:root {
+    --primary: #FF6B6B;
+    --secondary: #4ECDC4;
+    --light: #F7F7F7;
+    --dark: #343A40;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    margin-top: 72px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Raleway', sans-serif;
+}
+
+/* Spinner */
+#spinner {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s ease-out, visibility 0s linear .5s;
+    z-index: 99999;
+}
+
+#spinner.show {
+    transition: opacity .5s ease-out, visibility 0s linear 0s;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Back to top button */
+.back-to-top {
+    position: fixed;
+    display: none;
+    right: 45px;
+    bottom: 45px;
+    z-index: 99;
+}
+
+/* Hero Header */
+.hero-header {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/hero-bg.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* Features */
+.featurs-item {
+    transition: 0.5s;
+}
+
+.featurs-item:hover {
+    transform: translateY(-10px);
+}
+
+.featurs-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Product Item */
+.product-item {
+    transition: 0.5s;
+}
+
+.product-item:hover {
+    transform: translateY(-10px);
+}
+
+.product-item .btn-square {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Footer */
+.footer .btn-square {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Navbar */
+.navbar .navbar-nav .nav-link {
+    padding: 35px 15px;
+    color: var(--dark);
+    font-weight: 500;
+    outline: none;
+}
+
+.navbar .navbar-nav .nav-link:hover,
+.navbar .navbar-nav .nav-link.active {
+    color: var(--primary);
+}
+
+.navbar .dropdown-toggle::after {
+    border: none;
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    vertical-align: middle;
+    margin-left: 5px;
+    transition: .5s;
+}
+
+.navbar .dropdown-toggle[aria-expanded=true]::after {
+    transform: rotate(-180deg);
+}
+
+.navbar .dropdown-item:hover {
+    color: var(--primary);
+}
+
+/* Search Modal */
+.modal-header {
+    border-bottom: 0;
+}
+
+.modal-footer {
+    border-top: 0;
+}
+
+/* Cart Badge */
+.cart-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Product Badge */
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+}
+
+/* Button Styles */
+.btn {
+    font-weight: 500;
+    text-transform: uppercase;
+    padding: 0.5rem 1.5rem;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: #ff5252;
+    border-color: #ff5252;
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+.btn-secondary:hover {
+    background-color: #3dbeb6;
+    border-color: #3dbeb6;
+}
+
+/* Text Colors */
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.text-secondary {
+    color: var(--secondary) !important;
+}
+
+/* Background Colors */
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.bg-secondary {
+    background-color: var(--secondary) !important;
+}
+
+/* Form Controls */
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.25);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .navbar .navbar-nav .nav-link {
+        padding: 10px 15px;
+    }
+    
+    .navbar .navbar-nav .nav-link {
+        padding: 10px 15px;
+    }
+    
+    .navbar .navbar-nav .nav-link {
+        padding: 10px 15px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero-header {
+        padding: 2rem 0;
+    }
+    
+    .hero-header h1 {
+        font-size: 2rem;
+    }
+    
+    .featurs-item {
+        margin-bottom: 1rem;
+    }
+} 
