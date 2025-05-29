@@ -6,16 +6,34 @@ include 'templates/header.php';
  * Order Success Page
  * 
  * This page handles the successful completion of an order.
- * It is called by MoMo payment gateway after successful payment.
+ * It is called by payment gateways after successful payment.
  * 
  * Process:
- * 1. Clear the cart after successful order
- * 2. Display success message to user
- * 3. Provide option to continue shopping
+ * 1. Verify payment status
+ * 2. Clear the cart after successful order
+ * 3. Display success message to user
+ * 4. Provide option to continue shopping
  */
 
-// Clear cart after successful order
-$_SESSION['cart'] = [];
+// Check if this is a valid payment completion
+$paymentStatus = $_GET['status'] ?? '';
+$paymentSource = $_GET['source'] ?? '';
+
+// If no valid payment status or source, redirect to home
+if (empty($paymentStatus) || empty($paymentSource)) {
+    header('Location: index.php');
+    exit;
+}
+
+// Only clear cart if payment was successful
+if ($paymentStatus === 'success') {
+    // Clear cart after successful order
+    $_SESSION['cart'] = [];
+} else {
+    // If payment was not successful, redirect to checkout
+    header('Location: checkout.php?error=' . $paymentSource . '&message=' . urlencode(json_encode(['message' => 'Payment was not completed'])));
+    exit;
+}
 ?>
 
 <!-- Order Success Start -->

@@ -140,6 +140,12 @@ $error_message = $_GET['message'] ?? '';
                             <label class="form-check-label" for="momo">Ví MoMo</label>
                             <small class="text-muted d-block ms-4">(Áp dụng cho đơn hàng từ 50.000đ)</small>
                         </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="payment_method" id="paypal" value="paypal">
+                            <label class="form-check-label" for="paypal">
+                                <img src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_100x26.png" alt="PayPal" style="height: 20px;">
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Payment Notes -->
@@ -148,6 +154,7 @@ $error_message = $_GET['message'] ?? '';
                         <strong>Lưu ý:</strong>
                         <ul class="mb-0 mt-2">
                             <li>Thanh toán qua MoMo chỉ áp dụng cho đơn hàng từ 50.000đ</li>
+                            <li>Thanh toán qua PayPal sẽ được chuyển đổi sang USD theo tỷ giá hiện tại</li>
                             <li>Vui lòng kiểm tra kỹ thông tin đơn hàng trước khi thanh toán</li>
                             <li>Nếu có thắc mắc, vui lòng liên hệ hotline: 1900 1900</li>
                         </ul>
@@ -173,7 +180,8 @@ $error_message = $_GET['message'] ?? '';
  * 2. Checks MoMo minimum amount requirement
  * 3. Processes payment through selected method
  * 4. Handles MoMo payment redirection
- * 5. Processes regular orders
+ * 5. Processes PayPal payment
+ * 6. Processes regular orders
  */
 function processPayment() {
     const form = document.getElementById('checkoutForm');
@@ -201,34 +209,75 @@ function processPayment() {
             body: formData
         })
         .then(response => {
-            if (response.redirected) {
-                window.location.href = response.url;
-            } else {
-                return response.text().then(text => {
-                    try {
-                        const data = JSON.parse(text);
-                        if (data.payUrl) {
-                            window.location.href = data.payUrl;
-                        } else {
-                            throw new Error('No payment URL received');
-                        }
-                    } catch (e) {
-                        console.error('Error:', e);
-                        alert('Có lỗi xảy ra khi xử lý thanh toán MoMo');
-                    }
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || 'Payment processing failed');
                 });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.message || 'Payment processing failed');
+            }
+            if (data.payUrl) {
+                window.location.href = data.payUrl;
+            } else {
+                throw new Error('No payment URL received');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Có lỗi xảy ra khi xử lý thanh toán MoMo');
+            alert('Có lỗi xảy ra khi xử lý thanh toán MoMo: ' + error.message);
+        });
+    } else if (paymentMethod === 'paypal') {
+        // Process PayPal payment
+        const formData = new FormData(form);
+        fetch('add_paypal_gateway.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.paypalUrl) {
+                window.location.href = data.paypalUrl;
+            } else {
+                throw new Error(data.message || 'Payment processing failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi xử lý thanh toán PayPal');
         });
     } else {
-        // Process regular order
-        form.action = 'order_success.php';
-        form.method = 'post';
-        form.submit();
+        // Process regular order (COD or bank transfer)
+        const formData = new FormData(form);
+        fetch('process_order.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = 'order_success.php?status=success&source=' + paymentMethod;
+            } else {
+                throw new Error(data.message || 'Order processing failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi xử lý đơn hàng: ' + error.message);
+        });
     }
+}
+
+// Check for payment cancellation
+const urlParams = new URLSearchParams(window.location.search);
+const status = urlParams.get('status');
+const source = urlParams.get('source');
+
+if (status === 'cancelled' && (source === 'momo' || source === 'paypal')) {
+    window.location.href = 'order_cancel.php?source=' + source;
 }
 </script>
 
