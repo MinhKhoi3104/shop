@@ -9,8 +9,8 @@ require_once 'functions.php';
  */
 
 // PayPal configuration
-$paypalClientId = "YOUR_PAYPAL_CLIENT_ID"; // Replace with your PayPal client ID
-$paypalClientSecret = "YOUR_PAYPAL_CLIENT_SECRET"; // Replace with your PayPal client secret
+$paypalClientId = "AZVw7qrRKACLvctbtFwhF2rLTDur9sWwyhCDEqjNF0nqvzr0yDSTU1UJOU2CuUc87EiAZpURFsW0Y4AQ"; // Replace with your PayPal client ID
+$paypalClientSecret = "EGdQvZD3RRKGOyFR4AGgk9C1SUScbAtN0Q1MLD33Mv5oK-5Wh6Vhg3lzmjHRbmyramfg8RmgJK-DSygi"; // Replace with your PayPal client secret
 $paypalMode = "sandbox"; // Change to "live" for production
 $paypalEndpoint = ($paypalMode === "sandbox") 
     ? "https://api-m.sandbox.paypal.com" 
