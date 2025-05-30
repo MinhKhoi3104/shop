@@ -194,80 +194,87 @@ function processPayment() {
         return;
     }
 
-    // Handle MoMo payment
-    if (paymentMethod === 'momo') {
-        // Check minimum amount requirement
-        if (total < 50000) {
-            alert('Thanh toán qua MoMo chỉ áp dụng cho đơn hàng từ 50.000đ. Vui lòng chọn phương thức thanh toán khác.');
-            return;
-        }
+    // Create form data
+    const formData = new FormData(form);
+    formData.append('payment_method', paymentMethod);
 
-        // Process MoMo payment
-        const formData = new FormData(form);
-        fetch('momo.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
+    // Handle different payment methods
+    switch (paymentMethod) {
+        case 'cod':
+            // Process COD order
+            fetch('process_order.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = 'order_success.php?status=success&source=cod';
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra khi xử lý đơn hàng');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi xử lý đơn hàng');
+            });
+            break;
+
+        case 'momo':
+            // Check minimum amount requirement
+            if (total < 50000) {
+                alert('Thanh toán qua MoMo chỉ áp dụng cho đơn hàng từ 50.000đ. Vui lòng chọn phương thức thanh toán khác.');
+                return;
+            }
+
+            // Process MoMo payment
+            fetch('momo.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
                     throw new Error(data.message || 'Payment processing failed');
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.error) {
-                throw new Error(data.message || 'Payment processing failed');
-            }
-            if (data.payUrl) {
-                window.location.href = data.payUrl;
-            } else {
-                throw new Error('No payment URL received');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra khi xử lý thanh toán MoMo: ' + error.message);
-        });
-    } else if (paymentMethod === 'paypal') {
-        // Process PayPal payment
-        const formData = new FormData(form);
-        fetch('add_paypal_gateway.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.paypalUrl) {
-                window.location.href = data.paypalUrl;
-            } else {
-                throw new Error(data.message || 'Payment processing failed');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra khi xử lý thanh toán PayPal');
-        });
-    } else {
-        // Process regular order (COD or bank transfer)
-        const formData = new FormData(form);
-        fetch('process_order.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = 'order_success.php?status=success&source=' + paymentMethod;
-            } else {
-                throw new Error(data.message || 'Order processing failed');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra khi xử lý đơn hàng: ' + error.message);
-        });
+                }
+                if (data.payUrl) {
+                    window.location.href = data.payUrl;
+                } else {
+                    throw new Error('No payment URL received');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi xử lý thanh toán MoMo: ' + error.message);
+            });
+            break;
+
+        case 'paypal':
+            // Process PayPal payment
+            fetch('add_paypal_gateway.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.message || 'Payment processing failed');
+                }
+                if (data.paypalUrl) {
+                    window.location.href = data.paypalUrl;
+                } else {
+                    throw new Error('No payment URL received');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi xử lý thanh toán PayPal: ' + error.message);
+            });
+            break;
+
+        default:
+            alert('Phương thức thanh toán không hợp lệ');
+            break;
     }
 }
 
